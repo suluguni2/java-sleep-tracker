@@ -7,12 +7,23 @@ import ru.yandex.practicum.sleeptracker.UserChronotype;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class UserChronotypeFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class UserChronotypeFunction implements SleepAnalysisFunction {
+
+    private static final int OWL_SLEEP_HOUR = 23;
+    private static final int OWL_WAKE_HOUR = 9;
+    private static final int LARK_SLEEP_HOUR = 22;
+    private static final int LARK_WAKE_HOUR = 7;
+    private static final int NIGHT_END_HOUR = 6;
+    private static final int DAY_START_HOUR = 20;
+    private static final int NOON_HOUR = 12;
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -51,7 +62,7 @@ public class UserChronotypeFunction implements Function<List<SleepingSession>, S
     }
 
     private LocalDate determineFirstNight(LocalDateTime periodStart) {
-        if (periodStart.getHour() >= 12) {
+        if (periodStart.getHour() >= NOON_HOUR) {
             return periodStart.toLocalDate().plusDays(1);
         } else {
             return periodStart.toLocalDate();
@@ -64,7 +75,7 @@ public class UserChronotypeFunction implements Function<List<SleepingSession>, S
 
     private UserChronotype classifyNight(LocalDate nightDate, List<SleepingSession> sessions) {
         LocalDateTime nightStart = nightDate.atStartOfDay();
-        LocalDateTime nightEnd = nightDate.atTime(6, 0);
+        LocalDateTime nightEnd = nightDate.atTime(NIGHT_END_HOUR, 0);
 
         Optional<SleepingSession> matchingSession = sessions.stream()
                 .filter(session -> {
@@ -82,20 +93,23 @@ public class UserChronotypeFunction implements Function<List<SleepingSession>, S
         LocalTime sleepTime = session.getSleepStart().toLocalTime();
         LocalTime wakeTime = session.getWakeUp().toLocalTime();
 
-        if (sleepTime.isAfter(LocalTime.of(6, 0)) || sleepTime.equals(LocalTime.of(6, 0))) {
-            if (wakeTime.isAfter(sleepTime) && wakeTime.isBefore(LocalTime.of(20, 0))) {
-                return null;
-            }
+        if ((sleepTime.isAfter(LocalTime.of(NIGHT_END_HOUR, 0)) ||
+                sleepTime.equals(LocalTime.of(NIGHT_END_HOUR, 0))) &&
+                wakeTime.isAfter(sleepTime) &&
+                wakeTime.isBefore(LocalTime.of(DAY_START_HOUR, 0))) {
+            return null;
         }
 
         boolean isOwl;
-        if (sleepTime.isBefore(LocalTime.of(6, 0))) {
-            isOwl = !wakeTime.isBefore(LocalTime.of(9, 0));
+        if (sleepTime.isBefore(LocalTime.of(NIGHT_END_HOUR, 0))) {
+            isOwl = !wakeTime.isBefore(LocalTime.of(OWL_WAKE_HOUR, 0));
         } else {
-            isOwl = !sleepTime.isBefore(LocalTime.of(23, 0)) && !wakeTime.isBefore(LocalTime.of(9, 0));
+            isOwl = !sleepTime.isBefore(LocalTime.of(OWL_SLEEP_HOUR, 0))
+                    && !wakeTime.isBefore(LocalTime.of(OWL_WAKE_HOUR, 0));
         }
 
-        boolean isLark = sleepTime.isBefore(LocalTime.of(22, 0)) && !wakeTime.isAfter(LocalTime.of(7, 0));
+        boolean isLark = sleepTime.isBefore(LocalTime.of(LARK_SLEEP_HOUR, 0)) &&
+                !wakeTime.isAfter(LocalTime.of(LARK_WAKE_HOUR, 0));
 
         if (isOwl) {
             return UserChronotype.OWL;

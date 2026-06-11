@@ -37,18 +37,19 @@ public class SleepTrackerApp {
         }
 
         String filePath = args[0];
-        SleepTrackerApp app = new SleepTrackerApp();
 
         try {
-            List<SleepingSession> sessions = app.loadSleepLog(filePath);
+            List<SleepingSession> sessions = loadSleepLog(filePath);
             System.out.println("Загружено сессий сна: " + sessions.size());
             System.out.println();
+
+            SleepTrackerApp app = new SleepTrackerApp();
 
             app.analysisFunctions
                     .stream()
                     .map(function -> function.apply(sessions))
                     .forEach(result ->
-                            System.out.println(result.getDescription() + ": " + result.getValue())
+                            System.out.println(result.getDescription() + ": " + result.getValueAsString())
                     );
 
         } catch (IOException e) {
@@ -56,15 +57,15 @@ public class SleepTrackerApp {
         }
     }
 
-    private List<SleepingSession> loadSleepLog(String filePath) throws IOException {
+    private static List<SleepingSession> loadSleepLog(String filePath) throws IOException {
         return Files
                 .lines(Paths.get(filePath))
                 .filter(line -> !line.trim().isEmpty())
-                .map(this::parseLine)
+                .map(SleepTrackerApp::parseLine)
                 .collect(Collectors.toList());
     }
 
-    private SleepingSession parseLine(String line) {
+    private static SleepingSession parseLine(String line) {
         String[] parts = line.split(";");
         LocalDateTime sleepStart = LocalDateTime.parse(parts[0].trim(), FORMATTER);
         LocalDateTime wakeUp = LocalDateTime.parse(parts[1].trim(), FORMATTER);

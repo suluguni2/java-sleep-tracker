@@ -5,9 +5,8 @@ import ru.yandex.practicum.sleeptracker.SleepQuality;
 import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.util.List;
-import java.util.function.Function;
 
-public class BadSleepSessionsFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class BadSleepSessionsFunction implements SleepAnalysisFunction {
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -15,6 +14,6 @@ public class BadSleepSessionsFunction implements Function<List<SleepingSession>,
                 .filter(session -> session.getQuality() == SleepQuality.BAD)
                 .count();
 
-        return new SleepAnalysisResult("Количество сессий с плохим качеством сна", String.valueOf(count));
+        return new SleepAnalysisResult("Количество сессий с плохим качеством сна", count);
     }
 }

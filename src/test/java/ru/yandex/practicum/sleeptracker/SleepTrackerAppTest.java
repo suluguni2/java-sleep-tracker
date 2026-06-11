@@ -28,7 +28,7 @@ class SleepTrackerAppTest {
         SleepAnalysisResult result = function.apply(sessions);
 
         assertEquals("Всего сессий сна", result.getDescription());
-        assertEquals("2", result.getValue());
+        assertEquals("2", result.getValueAsString());
     }
 
     @Test
@@ -41,7 +41,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("0", result.getValue());
+        assertEquals("0", result.getValueAsString());
     }
 
     // MinSessionDurationFunction
@@ -60,7 +60,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("360 мин", result.getValue());
+        assertEquals("360", result.getValueAsString());
     }
 
     @Test
@@ -73,7 +73,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("нет данных", result.getValue());
+        assertEquals("нет данных", result.getValueAsString());
     }
 
     // MaxSessionDurationFunction
@@ -92,7 +92,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("600 мин", result.getValue());
+        assertEquals("600", result.getValueAsString());
     }
 
     @Test
@@ -107,7 +107,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("510 мин", result.getValue());
+        assertEquals("510", result.getValueAsString());
     }
 
     // AverageSessionDurationFunction
@@ -126,7 +126,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("480 мин", result.getValue());
+        assertEquals("480", result.getValueAsString());
     }
 
     @Test
@@ -139,7 +139,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("нет данных", result.getValue());
+        assertEquals("нет данных", result.getValueAsString());
     }
 
     // BadSleepSessionsFunction
@@ -159,7 +159,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("2", result.getValue());
+        assertEquals("2", result.getValueAsString());
     }
 
     @Test
@@ -175,10 +175,44 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("0", result.getValue());
+        assertEquals("0", result.getValueAsString());
     }
 
     // SleeplessNightsFunction
+
+    @Test
+    @DisplayName("Бессонные ночи: период логирования пересекает границу месяцев")
+    void testSleeplessNightsCrossesMonthBoundary() {
+        List<SleepingSession> sessions = List.of(
+                createSession(2026, 10, 31, 23, 0, 2026, 11, 1, 7, 0, SleepQuality.GOOD),
+                createSession(2026, 11, 1, 23, 0, 2026, 11, 2, 7, 0, SleepQuality.GOOD),
+                createSession(2026, 11, 3, 14, 0, 2026, 11, 3, 15, 0, SleepQuality.GOOD)
+        );
+
+        Function<List<SleepingSession>, SleepAnalysisResult> function =
+                new SleeplessNightsFunction();
+
+        SleepAnalysisResult result = function.apply(sessions);
+
+        assertEquals("2", result.getValueAsString());
+    }
+
+    @Test
+    @DisplayName("Бессонные ночи: бессонная ночь на границе месяцев")
+    void testSleeplessNightsOnMonthBoundary() {
+        List<SleepingSession> sessions = List.of(
+                createSession(2026, 10, 31, 14, 0, 2026, 10, 31, 15, 0, SleepQuality.GOOD),
+                createSession(2026, 11, 1, 14, 0, 2026, 11, 1, 15, 0, SleepQuality.GOOD),
+                createSession(2026, 11, 2, 23, 0, 2026, 11, 3, 7, 0, SleepQuality.GOOD)
+        );
+
+        Function<List<SleepingSession>, SleepAnalysisResult> function =
+                new SleeplessNightsFunction();
+
+        SleepAnalysisResult result = function.apply(sessions);
+
+        assertEquals("2", result.getValueAsString());
+    }
 
     @Test
     @DisplayName("Бессонные ночи: все ночи бессонные (дневной сон)")
@@ -194,7 +228,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("3", result.getValue());
+        assertEquals("3", result.getValueAsString());
     }
 
     @Test
@@ -211,7 +245,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("0", result.getValue());
+        assertEquals("0", result.getValueAsString());
     }
 
     @Test
@@ -228,7 +262,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("1", result.getValue());
+        assertEquals("1", result.getValueAsString());
     }
 
     @Test
@@ -243,7 +277,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("0", result.getValue());
+        assertEquals("0", result.getValueAsString());
     }
 
     @Test
@@ -256,7 +290,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("нет данных", result.getValue());
+        assertEquals("нет данных", result.getValueAsString());
     }
 
     @Test
@@ -271,7 +305,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("0", result.getValue());
+        assertEquals("0", result.getValueAsString());
     }
 
     // UserChronotypeFunction
@@ -290,7 +324,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("сова", result.getValue());
+        assertEquals("сова", result.getValueAsString());
     }
 
     @Test
@@ -307,7 +341,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("жаворонок", result.getValue());
+        assertEquals("жаворонок", result.getValueAsString());
     }
 
     @Test
@@ -324,7 +358,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("голубь", result.getValue());
+        assertEquals("голубь", result.getValueAsString());
     }
 
     @Test
@@ -340,7 +374,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("голубь", result.getValue());
+        assertEquals("голубь", result.getValueAsString());
     }
 
     @Test
@@ -353,7 +387,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("нет данных", result.getValue());
+        assertEquals("нет данных", result.getValueAsString());
     }
 
     @Test
@@ -369,7 +403,7 @@ class SleepTrackerAppTest {
 
         SleepAnalysisResult result = function.apply(sessions);
 
-        assertEquals("сова", result.getValue());
+        assertEquals("сова", result.getValueAsString());
     }
 
     // Вспомогательный метод

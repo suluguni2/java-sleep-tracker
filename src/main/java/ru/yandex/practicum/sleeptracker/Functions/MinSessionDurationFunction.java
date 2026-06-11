@@ -5,9 +5,8 @@ import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Function;
 
-public class MinSessionDurationFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class MinSessionDurationFunction implements SleepAnalysisFunction {
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -20,6 +19,6 @@ public class MinSessionDurationFunction implements Function<List<SleepingSession
                 .min()
                 .orElse(0);
 
-        return new SleepAnalysisResult("Минимальная продолжительность сессии", minMinutes + " мин");
+        return new SleepAnalysisResult("Минимальная продолжительность сессии", minMinutes);
     }
 }

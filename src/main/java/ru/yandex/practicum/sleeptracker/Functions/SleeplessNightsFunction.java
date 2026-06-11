@@ -6,10 +6,12 @@ import ru.yandex.practicum.sleeptracker.SleepingSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class SleeplessNightsFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class SleeplessNightsFunction implements SleepAnalysisFunction {
+
+    private static final int NOON_HOUR = 12;
+    private static final int NIGHT_END_HOUR = 6;
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -36,11 +38,11 @@ public class SleeplessNightsFunction implements Function<List<SleepingSession>, 
                 .filter(date -> isSleeplessNight(date, sessions))
                 .count();
 
-        return new SleepAnalysisResult("Количество бессонных ночей", String.valueOf(sleeplessNights));
+        return new SleepAnalysisResult("Количество бессонных ночей", sleeplessNights);
     }
 
     private LocalDate determineFirstNightDate(LocalDateTime periodStart) {
-        if (periodStart.getHour() >= 12) {
+        if (periodStart.getHour() >= NOON_HOUR) {
             return periodStart.toLocalDate().plusDays(1);
         } else {
             return periodStart.toLocalDate();
@@ -53,7 +55,7 @@ public class SleeplessNightsFunction implements Function<List<SleepingSession>, 
         boolean hadNightSleep = sessions.stream()
                 .anyMatch(session -> {
                     LocalDateTime nightStart = endDate.atStartOfDay();
-                    LocalDateTime nightEnd = endDate.atTime(6, 0);
+                    LocalDateTime nightEnd = endDate.atTime(NIGHT_END_HOUR, 0);
                     LocalDateTime sessionStart = session.getSleepStart();
                     LocalDateTime sessionEnd = session.getWakeUp();
                     return sessionStart.isBefore(nightEnd) && sessionEnd.isAfter(nightStart);
@@ -68,7 +70,7 @@ public class SleeplessNightsFunction implements Function<List<SleepingSession>, 
 
     private boolean isSleeplessNight(LocalDate nightDate, List<SleepingSession> sessions) {
         LocalDateTime nightStart = nightDate.atStartOfDay();
-        LocalDateTime nightEnd = nightDate.atTime(6, 0);
+        LocalDateTime nightEnd = nightDate.atTime(NIGHT_END_HOUR, 0);
 
         return sessions.stream()
                 .noneMatch(session -> {

@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
-public class MaxSessionDurationFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class MaxSessionDurationFunction implements SleepAnalysisFunction {
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -20,6 +20,6 @@ public class MaxSessionDurationFunction implements Function<List<SleepingSession
                 .max()
                 .orElse(0);
 
-        return new SleepAnalysisResult("Максимальная продолжительность сессии", maxMinutes + " мин");
+        return new SleepAnalysisResult("Максимальная продолжительность сессии", maxMinutes);
     }
 }

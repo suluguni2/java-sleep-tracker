@@ -5,9 +5,8 @@ import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Function;
 
-public class AverageSessionDurationFunction implements Function<List<SleepingSession>, SleepAnalysisResult> {
+public class AverageSessionDurationFunction implements SleepAnalysisFunction {
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -20,7 +19,6 @@ public class AverageSessionDurationFunction implements Function<List<SleepingSes
                 .average()
                 .orElse(0);
 
-        return new SleepAnalysisResult("Средняя продолжительность сессии",
-                Math.round(averageMinutes) + " мин");
+        return new SleepAnalysisResult("Средняя продолжительность сессии", Math.round(averageMinutes));
     }
 }
