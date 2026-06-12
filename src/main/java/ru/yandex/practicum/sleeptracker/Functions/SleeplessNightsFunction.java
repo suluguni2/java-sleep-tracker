@@ -5,13 +5,14 @@ import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class SleeplessNightsFunction implements SleepAnalysisFunction {
 
     private static final int NOON_HOUR = 12;
-    private static final int NIGHT_END_HOUR = 6;
+    private static final LocalTime NIGHT_END_TIME = LocalTime.of(6, 0);
 
     @Override
     public SleepAnalysisResult apply(List<SleepingSession> sessions) {
@@ -55,7 +56,7 @@ public class SleeplessNightsFunction implements SleepAnalysisFunction {
         boolean hadNightSleep = sessions.stream()
                 .anyMatch(session -> {
                     LocalDateTime nightStart = endDate.atStartOfDay();
-                    LocalDateTime nightEnd = endDate.atTime(NIGHT_END_HOUR, 0);
+                    LocalDateTime nightEnd = endDate.atTime(NIGHT_END_TIME);
                     LocalDateTime sessionStart = session.getSleepStart();
                     LocalDateTime sessionEnd = session.getWakeUp();
                     return sessionStart.isBefore(nightEnd) && sessionEnd.isAfter(nightStart);
@@ -70,7 +71,7 @@ public class SleeplessNightsFunction implements SleepAnalysisFunction {
 
     private boolean isSleeplessNight(LocalDate nightDate, List<SleepingSession> sessions) {
         LocalDateTime nightStart = nightDate.atStartOfDay();
-        LocalDateTime nightEnd = nightDate.atTime(NIGHT_END_HOUR, 0);
+        LocalDateTime nightEnd = nightDate.atTime(NIGHT_END_TIME);
 
         return sessions.stream()
                 .noneMatch(session -> {

@@ -17,17 +17,16 @@ public class SleepTrackerApp {
     private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.yy HH:mm");
 
-    private final List<Function<List<SleepingSession>, SleepAnalysisResult>> analysisFunctions;
+    private static final List<Function<List<SleepingSession>, SleepAnalysisResult>> analysisFunctions = new ArrayList<>();
 
-    public SleepTrackerApp() {
-        this.analysisFunctions = new ArrayList<>();
-        this.analysisFunctions.add(new TotalSessionsFunction());
-        this.analysisFunctions.add(new MinSessionDurationFunction());
-        this.analysisFunctions.add(new MaxSessionDurationFunction());
-        this.analysisFunctions.add(new AverageSessionDurationFunction());
-        this.analysisFunctions.add(new BadSleepSessionsFunction());
-        this.analysisFunctions.add(new SleeplessNightsFunction());
-        this.analysisFunctions.add(new UserChronotypeFunction());
+    static {
+        analysisFunctions.add(new TotalSessionsFunction());
+        analysisFunctions.add(new MinSessionDurationFunction());
+        analysisFunctions.add(new MaxSessionDurationFunction());
+        analysisFunctions.add(new AverageSessionDurationFunction());
+        analysisFunctions.add(new BadSleepSessionsFunction());
+        analysisFunctions.add(new SleeplessNightsFunction());
+        analysisFunctions.add(new UserChronotypeFunction());
     }
 
     public static void main(String[] args) {
@@ -43,9 +42,8 @@ public class SleepTrackerApp {
             System.out.println("Загружено сессий сна: " + sessions.size());
             System.out.println();
 
-            SleepTrackerApp app = new SleepTrackerApp();
 
-            app.analysisFunctions
+            analysisFunctions
                     .stream()
                     .map(function -> function.apply(sessions))
                     .forEach(result ->
